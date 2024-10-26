@@ -8,19 +8,39 @@ layout(set = 0, binding = 0) uniform CameraBufferObject {
     mat4 proj;
 } camera;
 
-// TODO: Declare tessellation control shader inputs and outputs
+layout(location = 0) in vec4 tescV0[];
+layout(location = 1) in vec4 tescV1[];
+layout(location = 2) in vec4 tescV2[];
+layout(location = 3) in vec4 tescUp[];
+
+layout(location = 0) out vec4 teseV0[];
+layout(location = 1) out vec4 teseV1[];
+layout(location = 2) out vec4 teseV2[];
+layout(location = 3) out vec4 teseUp[];
+
+in gl_PerVertex {
+	vec4 gl_Position;
+} gl_in[gl_MaxPatchVertices];
+
+int calculateLOD(vec3 pos, vec3 camPos) {
+    float dist = distance(pos, camPos);
+    return int(ceil(mix(12, 1, smoothstep(15, 1, dist))));
+}
 
 void main() {
 	// Don't move the origin location of the patch
     gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 
-	// TODO: Write any shader outputs
+    teseV0[gl_InvocationID] = tescV0[gl_InvocationID];
+    teseV1[gl_InvocationID] = tescV1[gl_InvocationID];
+    teseV2[gl_InvocationID] = tescV2[gl_InvocationID];
+    teseUp[gl_InvocationID] = tescUp[gl_InvocationID];
 
-	// TODO: Set level of tesselation
-    // gl_TessLevelInner[0] = ???
-    // gl_TessLevelInner[1] = ???
-    // gl_TessLevelOuter[0] = ???
-    // gl_TessLevelOuter[1] = ???
-    // gl_TessLevelOuter[2] = ???
-    // gl_TessLevelOuter[3] = ???
+    int lod = calculateLOD(gl_out[gl_InvocationID].gl_Position.xyz, -camera.view[3].xyz);
+    gl_TessLevelInner[0] = lod;
+    gl_TessLevelInner[1] = lod;
+    gl_TessLevelOuter[0] = lod;
+    gl_TessLevelOuter[1] = lod;
+    gl_TessLevelOuter[2] = lod;
+    gl_TessLevelOuter[3] = lod;
 }
