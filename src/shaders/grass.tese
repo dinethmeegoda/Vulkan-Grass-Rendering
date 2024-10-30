@@ -13,6 +13,10 @@ layout(location = 1) in vec4 teseV1[];
 layout(location = 2) in vec4 teseV2[];
 layout(location = 3) in vec4 teseUp[];
 
+layout(location = 0) out vec4 fs_Pos;
+layout(location = 1) out vec3 fs_Nor;
+layout(location = 2) out vec2 fs_UV;
+
 void main() {
     float u = gl_TessCoord.x;
     float v = gl_TessCoord.y;
@@ -38,11 +42,12 @@ void main() {
     vec3 c1 = c + width * orientationVec;
 
     vec3 tangent = normalize(b - a);
-    vec3 normal = cross(tangent, orientationVec);
+    fs_Nor = normalize(cross(tangent, orientationVec));
 
     float t = u + v * (0.5 - u);
 
-    vec3 position = c0 + (c1 - c0) * t;
-    gl_Position = camera.proj * camera.view * vec4(position, 1.0);
-
+    vec4 position = vec4(c0 + (c1 - c0) * t, 1.0);
+    gl_Position = camera.proj * camera.view * position;
+    fs_Pos = position;
+    fs_UV = vec2(u, v);
 }

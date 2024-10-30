@@ -24,7 +24,7 @@ in gl_PerVertex {
 
 int calculateLOD(vec3 pos, vec3 camPos) {
     float dist = distance(pos, camPos);
-    return int(ceil(mix(12, 1, smoothstep(15, 1, dist))));
+    return int(ceil(mix(8, 1, smoothstep(1, 12, dist))));
 }
 
 void main() {
@@ -36,7 +36,7 @@ void main() {
     teseV2[gl_InvocationID] = tescV2[gl_InvocationID];
     teseUp[gl_InvocationID] = tescUp[gl_InvocationID];
 
-    int lod = calculateLOD(gl_out[gl_InvocationID].gl_Position.xyz, -camera.view[3].xyz);
+    int lod = calculateLOD(gl_out[gl_InvocationID].gl_Position.xyz, inverse(camera.view)[3].xyz);
     gl_TessLevelInner[0] = lod;
     gl_TessLevelInner[1] = lod;
     gl_TessLevelOuter[0] = lod;

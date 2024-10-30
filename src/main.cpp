@@ -1,3 +1,4 @@
+#include <string>
 #include <vulkan/vulkan.h>
 #include "Instance.h"
 #include "Window.h"
@@ -116,7 +117,7 @@ int main() {
         grassImageMemory
     );
 
-    float planeDim = 15.f;
+    float planeDim = 20.f;
     float halfWidth = planeDim * 0.5f;
     Model* plane = new Model(device, transferCommandPool,
         {
@@ -143,7 +144,24 @@ int main() {
     glfwSetMouseButtonCallback(GetGLFWWindow(), mouseDownCallback);
     glfwSetCursorPosCallback(GetGLFWWindow(), mouseMoveCallback);
 
+    double fps = 0.0;
+    double prev = 0.0;
+    int frames = 0;
+    std::string title;
+
     while (!ShouldQuit()) {
+        frames++;
+		double curr = glfwGetTime();
+
+		if (curr - prev >= 1.0) {
+			fps = double(frames) / (curr - prev);
+			prev = curr;
+			frames = 0;
+		}
+
+        title = applicationName + std::string("Vulkan Grass Rendering (") + std::to_string(fps) + " fps)";
+        glfwSetWindowTitle(GetGLFWWindow(), title.c_str());
+
         glfwPollEvents();
         scene->UpdateTime();
         renderer->Frame();
